@@ -12,8 +12,9 @@ public class MpesaConfig {
     private String consumerSecret;
     private String grantType;
     private String oauthEndpoint;
-    private String shortCode;
+    private String businessShortCode;
     private String responseType;
+    private String stkPushPassKey;
     private String confirmationUrl;
     private String validationUrl;
     private String urlRegistrationEndpoint;
