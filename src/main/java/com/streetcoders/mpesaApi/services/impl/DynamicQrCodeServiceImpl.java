@@ -1,5 +1,6 @@
 package com.streetcoders.mpesaApi.services.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.streetcoders.mpesaApi.common.config.MpesaConfig;
 import com.streetcoders.mpesaApi.dtos.AccessTokenResponseDTO;
@@ -30,30 +31,26 @@ public class DynamicQrCodeServiceImpl implements DynamicQrCodeService {
     }
 
     @Override
-    public DynamicQrCodeResponseDTO generateQrCode(DynamicQrCodeReqDTO dynamicQrCodeReqDTO) {
+    public DynamicQrCodeResponseDTO generateQrCode(DynamicQrCodeReqDTO dynamicQrCodeReqDTO) throws JsonProcessingException {
 
-        String jsonRequestBody = "";
+        log.info("Generating the QR code for the following information: {}", objectMapper.writeValueAsString(dynamicQrCodeReqDTO));
 
-        try{
+        String jsonRequestBody = objectMapper.writeValueAsString(dynamicQrCodeReqDTO);
 
-            jsonRequestBody = objectMapper.writeValueAsString(dynamicQrCodeReqDTO);
             RequestBody requestBody = RequestBody.create(jsonRequestBody, MediaType.parse("application/json"));
             Request request = new Request.Builder()
                     .url(mpesaConfig.getDynamicQrCodeEndpoint())
                     .post(requestBody)
-                    .addHeader("Bearer", "Bearer " + authService.generateAccessToken())
+                    .addHeader("Authorization", "Bearer " + authService.generateAccessToken().getAccessToken())
                     .addHeader("Content-Type", "application/json")
                     .build();
 
-            try{
-
-                Response response = okHttpClient.newCall(request).execute();
-
+            try (Response response = okHttpClient.newCall(request).execute()) {
                 if (!response.isSuccessful()) {
-
+                    String errorBody = response.body().string();
                     log.error("Request failed with status code: {}", response.code());
-                    log.error("Error: {}", response.message());
-
+                    log.error("Error message: {}", response.message());
+                    log.error("Error body: {}", errorBody);
                     return null;
                 }
 
@@ -65,19 +62,12 @@ public class DynamicQrCodeServiceImpl implements DynamicQrCodeService {
                 }
 
                 log.info("Received response: {}", responseBody);
-
                 return objectMapper.readValue(responseBody, DynamicQrCodeResponseDTO.class);
+
             } catch (IOException e) {
-                log.error("Error occurred while fetching the QR token: {}", e.getMessage());
+                log.error("Error occurred while fetching the QR token: {}", e.getMessage(), e);
                 return null;
             }
-
-
-        }catch(Exception ex){
-            log.error(ex.getMessage());
-            return null;
-        }
-
     }
 
 }
