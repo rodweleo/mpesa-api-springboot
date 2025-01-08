@@ -12,8 +12,9 @@ public class MpesaConfig {
     private String consumerSecret;
     private String grantType;
     private String oauthEndpoint;
-    private String shortCode;
+    private String businessShortCode;
     private String responseType;
+    private String stkPushPassKey;
     private String confirmationUrl;
     private String validationUrl;
     private String urlRegistrationEndpoint;
@@ -21,6 +22,7 @@ public class MpesaConfig {
     private String b2cTransactionEndpoint;
     private String stkPushEndpoint;
     private String dynamicQrCodeEndpoint;
+    private String transactionStatusEndpoint;
 
     public String toString() {
         return "MpesaConfig{" +
