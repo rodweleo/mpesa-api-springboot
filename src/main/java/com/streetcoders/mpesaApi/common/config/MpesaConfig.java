@@ -22,6 +22,7 @@ public class MpesaConfig {
     private String b2cTransactionEndpoint;
     private String stkPushEndpoint;
     private String dynamicQrCodeEndpoint;
+    private String transactionStatusEndpoint;
 
     public String toString() {
         return "MpesaConfig{" +
